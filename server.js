@@ -4,26 +4,9 @@ const PORT = 8081;
 
 app.use(express.json()); // para trabalhar com json no express é necessario essa expressão
 
-async function validaNumeros(pArray) {
-    if (pArray.some(elemento => typeof elemento != 'number')) { //parametro "some" para verificar se existe 1 elemento que nao seja number
-        throw new Error('Revise os numeros do array');
-    }
-    return pArray;
-}
-
-async function somaArray(pArray) {
-    const arrayValidado = await validaNumeros(pArray)
-
-    return arrayValidado.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
-}
-
-
 app.post('/soma', async (req,res) => {
     try {
-        const {arraySoma} = req.body;
-        const resultadoSoma = await somaArray(arraySoma);
-
-        res.status(201).json({resultado: `O resultado da soma do array é ${resultadoSoma}`});
+       
     } catch (error) {
         res.status(500).json({message: `Ocorreu um erro ao processar a requisição`, errorMessage: error.message});
     }
