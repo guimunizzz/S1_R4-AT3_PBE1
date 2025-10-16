@@ -1,4 +1,4 @@
-const express = require('express');
+const express = require("express");
 const app = express();
 const fs = require("fs");
 const PORT = 8081;
@@ -7,10 +7,10 @@ app.use(express.json()); // para trabalhar com json no express é necessario ess
 
 async function validaNome(pNome) {
     if (!isNaN(pNome)) {
-        throw new Error('Nome inválido, tente novamente!');
+        throw new Error("Nome inválido, tente novamente!");
     } else {
         if (pNome.length < 3) {
-            throw new Error('O nome deve ter no minimo 3 caracteres');
+            throw new Error("O nome deve ter no minimo 3 caracteres");
         }
         return pNome;
     }
@@ -18,10 +18,10 @@ async function validaNome(pNome) {
 
 async function validaEmail(pEmail) {
     if (!isNaN(pEmail)) {
-        throw new Error('Email inválido, tente novamente!');
+        throw new Error("Email inválido, tente novamente!");
     } else {
         if (!pEmail.includes("@")) {
-            throw new Error('O email deve ter @');
+            throw new Error("O email deve ter @");
         }
         return pEmail;
     }
@@ -29,12 +29,12 @@ async function validaEmail(pEmail) {
 
 async function validaSenha(pSenha) {
     if (pSenha.length < 4) {
-        throw new Error('Sua senha deve ter no minimo 4 caracteres');
+        throw new Error("Sua senha deve ter no minimo 4 caracteres");
     }
     return pSenha;
 }
 
-app.post('/usuarios', async (req, res) => {
+app.post("/usuarios", async (req, res) => {
     try {
         const { nome, email, senha } = req.body;
 
@@ -42,21 +42,26 @@ app.post('/usuarios', async (req, res) => {
         const emailValidado = await validaEmail(email);
         const senhaValidado = await validaSenha(senha);
 
-        const conteudo = JSON.stringify({ nome: `${nomeValidado}`, Email: `${emailValidado}`, senha: `${senhaValidado}` }, null, 2);
+        let conteudo = [];
+        const usuario = { nomeValidado, emailValidado, senhaValidado };
+        const nomeArquivo = "conteudo.json";
 
-        fs.writeFileSync("usuarios.json", conteudo, "utf-8");
+        if (fs.existsSync(nomeArquivo)) {
+            conteudo = JSON.parse(fs.readFileSync(nomeArquivo, "utf-8"));
+        }
+        conteudo.push(usuario);
+        fs.writeFileSync(nomeArquivo, JSON.stringify(conteudo, null, 2), "utf-8");
 
         res.status(201).json({ message: "Arquivo .json criado!" });
     } catch (error) {
-        res.status(500).json({ message: `Ocorreu um erro ao processar a requisição`, errorMessage: error.message });
+        res.status(500).json({message: `Ocorreu um erro ao processar a requisição`,errorMessage: error.message,});
     }
-})
-
+});
 
 app.use((req, res) => {
     res.status(404).send("Pagina não encontrada");
-})
+});
 
 app.listen(PORT, () => {
     console.log(`Servidor respondendo em: http://localhost:${PORT}`);
-})
+});
