@@ -1,23 +1,54 @@
 const express = require('express');
 const app = express();
+const fs = require("fs");
 const PORT = 8081;
 
 app.use(express.json()); // para trabalhar com json no express é necessario essa expressão
 
-async function somaArray(pArray) {
-    const filtraArray = pArray.filter(elemento => typeof elemento === 'number');
-    const somaFiltro = filtraArray.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
-    return somaFiltro;
+async function validaNome(pNome) {
+    if (!isNaN(pNome)) {
+        throw new Error('Nome inválido, tente novamente!');
+    } else {
+        if (pNome.length < 3) {
+            throw new Error('O nome deve ter no minimo 3 caracteres');
+        }
+        return pNome;
+    }
 }
 
-app.post('/soma', async (req,res) => {
-    try {
-        const {arraySoma} = req.body;
-        const resultadoSoma = await somaArray(arraySoma);
+async function validaEmail(pEmail) {
+    if (!isNaN(pEmail)) {
+        throw new Error('Email inválido, tente novamente!');
+    } else {
+        if (!pEmail.includes("@")) {
+            throw new Error('O email deve ter @');
+        }
+        return pEmail;
+    }
+}
 
-        res.status(201).json({resultado: `O resultado da soma do array é ${resultadoSoma}`});
+async function validaSenha(pSenha) {
+    if (pSenha.length < 4) {
+        throw new Error('Sua senha deve ter no minimo 4 caracteres');
+    }
+    return pSenha;
+}
+
+app.post('/usuarios', async (req, res) => {
+    try {
+        const { nome, email, senha } = req.body;
+
+        const nomeValidado = await validaNome(nome);
+        const emailValidado = await validaEmail(email);
+        const senhaValidado = await validaSenha(senha);
+
+        const conteudo = JSON.stringify({ nome: `${nomeValidado}`, Email: `${emailValidado}`, senha: `${senhaValidado}` }, null, 2);
+
+        fs.writeFileSync("usuarios.json", conteudo, "utf-8");
+
+        res.status(201).json({ message: "Arquivo .json criado!" });
     } catch (error) {
-        res.status(500).json({message: `Ocorreu um erro ao processar a requisição`, errorMessage: error.message});
+        res.status(500).json({ message: `Ocorreu um erro ao processar a requisição`, errorMessage: error.message });
     }
 })
 
@@ -26,6 +57,6 @@ app.use((req, res) => {
     res.status(404).send("Pagina não encontrada");
 })
 
-app.listen(PORT, ()=> {
+app.listen(PORT, () => {
     console.log(`Servidor respondendo em: http://localhost:${PORT}`);
 })
