@@ -5,13 +5,9 @@ const PORT = 8081;
 app.use(express.json()); // para trabalhar com json no express é necessario essa expressão
 
 async function somaArray(pArray) {
-    pArray.forEach(elemento => {
-        if (typeof elemento === 'number') { // falta arrumar a soma dos numeros
-            const soma = pArray.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
-            console.log(pArray.elemento);
-            return soma;
-        }
-    });    
+    const filtraArray = pArray.filter(elemento => typeof elemento === 'number');
+    const somaFiltro = filtraArray.reduce((acumulador, valorAtual) => acumulador + valorAtual, 0);
+    return somaFiltro;
 }
 
 app.post('/soma', async (req,res) => {
