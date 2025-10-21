@@ -30,7 +30,7 @@ async function aprovacaoNotas(mediaNotas) {
     if (mediaNotas > 6) {
         return "aprovada";
     }
-    return "aeprovada"
+    return "aprovada"
 }
 
 app.post('/alunos', async (req,res) => {
